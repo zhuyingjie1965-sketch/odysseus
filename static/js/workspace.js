@@ -49,7 +49,7 @@ export function setWorkspace(path) {
 
 export function clearWorkspace() {
   setWorkspace('');
-  if (uiModule && uiModule.showToast) uiModule.showToast('Workspace cleared');
+  if (uiModule && uiModule.showToast) uiModule.showToast(window.t?window.t('workspace.cleared'):'Workspace cleared');
 }
 
 async function _load(path) {
@@ -125,7 +125,7 @@ function _getModal() {
   });
   _modal.querySelector('#workspace-use').addEventListener('click', () => {
     setWorkspace(_curPath);
-    if (uiModule && uiModule.showToast) uiModule.showToast(`Workspace set: ${_basename(_curPath)}`);
+    if (uiModule && uiModule.showToast) uiModule.showToast(window.t?window.t('workspace.set',{name:_basename(_curPath)}):`Workspace set: ${_basename(_curPath)}`);
     closeWorkspaceBrowser();
   });
   const content = _modal.querySelector('.modal-content');

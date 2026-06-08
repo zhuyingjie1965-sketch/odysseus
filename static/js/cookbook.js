@@ -805,7 +805,7 @@ async function _fetchDependencies() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ command: fullCmd }),
           });
-          uiModule.showToast(`${upgrade ? 'Updating' : 'Installing'} ${pkgName} on ${targetHost}...`);
+          uiModule.showToast(window.t?window.t('cookbook.installing',{action:upgrade?'Updating':'Installing',pkg:pkgName,host:targetHost}):`${upgrade ? 'Updating' : 'Installing'} ${pkgName} on ${targetHost}...`);
           const body = await res.text();
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const exitMatches = [...body.matchAll(/"exit_code":\s*(-?\d+)/g)].map(m => Number(m[1]));
@@ -814,12 +814,12 @@ async function _fetchDependencies() {
             throw new Error((body.slice(-500).trim() || `${pkgName} command failed`) + ` (exit ${exitCode})`);
           }
 
-          if (upgrade) { uiModule.showToast(`Successfully updated ${pkgName} on ${targetHost}.`); } else { uiModule.showToast(`Successfully installed ${pkgName} on ${targetHost}.`); }
+          if (upgrade) { uiModule.showToast(window.t?window.t('cookbook.installSuccess',{action:'updated',pkg:pkgName,host:targetHost}):`Successfully updated ${pkgName} on ${targetHost}.`); } else { uiModule.showToast(window.t?window.t('cookbook.installSuccess',{action:'installed',pkg:pkgName,host:targetHost}):`Successfully installed ${pkgName} on ${targetHost}.`); }
           await _fetchDependencies();
           return;
         } catch (err) {
           if (statusEl) { statusEl.textContent = 'Install'; statusEl.disabled = false; }
-          uiModule.showToast(`${upgrade ? 'Update' : 'Install'} failed: ` + err.message);
+          uiModule.showToast(window.t?window.t('cookbook.installFailed',{action:upgrade?'Update':'Install',err:err.message}):`${upgrade ? 'Update' : 'Install'} failed: ` + err.message);
           return;
         }
       }
@@ -848,7 +848,7 @@ async function _fetchDependencies() {
           // FastAPI HTTPException returns {detail: …}; the route's own
           // path returns {ok:false, error:…}. Surface whichever we get.
           const reason = data.detail || data.error || `HTTP ${res.status}`;
-          uiModule.showToast('Install failed: ' + String(reason).slice(0, 200));
+          uiModule.showToast(window.t?window.t('cookbook.installFailed',{action:'Install',err:String(reason).slice(0,200)}):'Install failed: '+String(reason).slice(0,200));
           return;
         }
         // _dep flags this as a pip dependency/driver install (not a servable
@@ -856,9 +856,9 @@ async function _fetchDependencies() {
         const payload = { repo_id: pipName, _cmd: cmd, remote_host: _envState.remoteHost || '', _dep: true, env_path: _envState.envPath || '' };
         _addTask(data.session_id, 'pip ' + pkgName, 'download', payload);
         if (statusEl) { statusEl.textContent = upgrade ? 'Updating...' : 'Installing...'; statusEl.disabled = true; }
-        uiModule.showToast(`${upgrade ? 'Updating' : 'Installing'} ${pkgName} on ${targetHost}...`);
+        uiModule.showToast(window.t?window.t('cookbook.installing',{action:upgrade?'Updating':'Installing',pkg:pkgName,host:targetHost}):`${upgrade ? 'Updating' : 'Installing'} ${pkgName} on ${targetHost}...`);
       } catch (err) {
-        uiModule.showToast('Install failed: ' + err.message);
+        uiModule.showToast(window.t?window.t('cookbook.installFailed',{action:'Install',err:err.message}):'Install failed: '+err.message);
       }
     }
 
@@ -1177,12 +1177,12 @@ function _wireTabEvents(body) {
         const data = await res.json().catch(() => ({}));
         if (!res.ok || !data.ok) {
           const reason = data.detail || data.error || `HTTP ${res.status}`;
-          uiModule.showToast('Rebuild failed: ' + String(reason).slice(0, 200));
+          uiModule.showToast(window.t?window.t('cookbook.rebuildFailed',{err:String(reason).slice(0,200)}):'Rebuild failed: '+String(reason).slice(0,200));
         } else {
-          uiModule.showToast(`Cleared llama.cpp build on ${where}. Re-launch the serve task to rebuild with GPU support.`);
+          uiModule.showToast(window.t?window.t('cookbook.clearBuild',{host:where}):`Cleared llama.cpp build on ${where}. Re-launch the serve task to rebuild with GPU support.`);
         }
       } catch (err) {
-        uiModule.showToast('Rebuild failed: ' + err.message);
+        uiModule.showToast(window.t?window.t('cookbook.rebuildFailed',{err:err.message}):'Rebuild failed: '+err.message);
       } finally {
         rebuildBtn.disabled = false;
         rebuildBtn.textContent = _label;
@@ -1282,7 +1282,7 @@ function _wireTabEvents(body) {
         const item = dot.closest('.memory-item[data-repo]');
         if (item?.dataset.repo) repos.push(item.dataset.repo);
       });
-      if (!(await uiModule.styledConfirm(`Delete ${repos.length} model(s)? This removes cached files.`, { confirmText: 'Delete', danger: true }))) return;
+      if (!(await uiModule.styledConfirm(window.t?window.t('cookbook.deleteModels',{n:repos.length}):`Delete ${repos.length} model(s)? This removes cached files.`, { confirmText: window.t?window.t('cookbook.delete'):'Delete', danger: true }))) return;
       for (const repo of repos) {
         const item = document.querySelector(`.memory-item[data-repo="${repo}"]`);
         if (item) await _deleteCachedModel(repo, item, true);
@@ -1330,7 +1330,7 @@ function _wireTabEvents(body) {
       // HuggingFace repo IDs must be `org/model`. A bare model name would 404
       // at snapshot_download time with a raw traceback, so reject it up front.
       if (!/^[^\s/]+\/[^\s/]+$/.test(repo)) {
-        uiModule.showToast('Enter a full HuggingFace repo ID like "org/model-name" (or paste the full HF URL).');
+        uiModule.showToast(window.t?window.t('cookbook.invalidRepoId'):'Enter a full HuggingFace repo ID like "org/model-name" (or paste the full HF URL).');
         dlInput.focus();
         return;
       }

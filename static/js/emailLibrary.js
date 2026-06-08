@@ -152,13 +152,13 @@ function _wireRecipientChips(root) {
         if (!copied) throw new Error('copy failed');
         copyBtn.classList.add('copied');
         copyBtn.title = 'Copied';
-        showToast?.('Email copied');
+        showToast?.(window.t?window.t('email.copied'):'Email copied');
         setTimeout(() => {
           copyBtn.classList.remove('copied');
           copyBtn.title = 'Copy email';
         }, 900);
       } catch (_) {
-        showToast?.('Copy failed');
+        showToast?.(window.t?window.t('email.copyFailed'):'Copy failed');
       }
       return;
     }
@@ -485,7 +485,7 @@ async function _deleteEmailAndAdvance(em, card, opts = {}) {
   if (!em || em.uid == null) return;
   if (opts.confirm !== false) {
     const subject = em.subject || '(no subject)';
-    const ok = await styledConfirm(`Delete "${subject}"?`, { confirmText: 'Delete', cancelText: 'Cancel', danger: true });
+    const ok = await styledConfirm(window.t?window.t('email.deleteEmail',{subject}):`Delete "${subject}"?`, { confirmText: window.t?window.t('email.delete'):'Delete', cancelText: window.t?window.t('email.cancel'):'Cancel', danger: true });
     if (!ok) return;
   }
   const wasExpanded = !!card?.classList?.contains('doclib-card-expanded');
@@ -497,7 +497,7 @@ async function _deleteEmailAndAdvance(em, card, opts = {}) {
     await fetch(`${API_BASE}/api/email/delete/${em.uid}?folder=${encodeURIComponent(state._libFolder)}${_acct()}`, { method: 'DELETE' });
   } catch (err) {
     console.error('Failed to delete email:', err);
-    showToast('Failed to delete email');
+    showToast(window.t?window.t('email.deleteFailed'):'Failed to delete email');
     return;
   }
   await _animateEmailCardRemoval([em.uid]);
@@ -506,7 +506,7 @@ async function _deleteEmailAndAdvance(em, card, opts = {}) {
   _updateBulkBar();
   _renderGrid();
   _libCacheWriteBack();
-  showToast('Moved to Trash');
+  showToast(window.t?window.t('email.movedToTrash'):'Moved to Trash');
   if (!wasExpanded || !nextUid) return;
   const grid = document.getElementById('email-lib-grid');
   const nextCard = grid?.querySelector(`.doclib-card[data-uid="${CSS.escape(String(nextUid))}"]`);
@@ -979,7 +979,7 @@ export function openEmailLibrary(opts = {}) {
     _loadEmailsFresh();
   });
   document.getElementById('email-reminders-clear-btn')?.addEventListener('click', async () => {
-    const ok = await styledConfirm('Permanently delete all Odysseus reminder emails?', {
+    const ok = await styledConfirm(window.t?window.t('email.clearReminders'):'Permanently delete all Odysseus reminder emails?', {
       confirmText: 'Delete',
       cancelText: 'Cancel',
       danger: true,
@@ -991,7 +991,7 @@ export function openEmailLibrary(opts = {}) {
         credentials: 'same-origin',
       });
       const data = await res.json().catch(() => ({}));
-      showToast(`Deleted ${data.deleted || 0} reminder email${(data.deleted || 0) === 1 ? '' : 's'}`);
+      showToast(window.t?window.t('email.clearRemindersDone',{n:data.deleted||0,s:(data.deleted||0)===1?'':'s'}):`Deleted ${data.deleted||0} reminder email${(data.deleted||0)===1?'':'s'}`);
       if ((data.deleted || 0) > 0) {
         const visibleUids = Array.from(document.querySelectorAll('#email-lib-grid .doclib-card[data-uid]'))
           .map(card => card.dataset.uid)
@@ -1006,7 +1006,7 @@ export function openEmailLibrary(opts = {}) {
       _loadEmailsFresh();
     } catch (err) {
       console.error(err);
-      showToast('Failed to clear reminder emails');
+      showToast(window.t?window.t('email.clearRemindersFailed'):'Failed to clear reminder emails');
     }
   });
   document.getElementById('email-undone-btn')?.addEventListener('click', () => {
@@ -1210,7 +1210,7 @@ export function openEmailLibrary(opts = {}) {
   document.getElementById('email-lib-bulk-actions').addEventListener('click', (e) => {
     e.stopPropagation();
     if (state._selectedUids.size === 0) {
-      showToast('Select emails first');
+      showToast(window.t?window.t('email.selectFirst'):'Select emails first');
       return;
     }
     _showBulkActionsMenu(e.currentTarget);
@@ -1766,7 +1766,7 @@ async function _loadScheduled(grid, sp) {
     cancelBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const { styledConfirm } = await import('./ui.js');
-      const ok = await styledConfirm(`Cancel scheduled email "${subject}"?`, { confirmText: 'Cancel Send', cancelText: 'Keep', danger: true });
+      const ok = await styledConfirm(window.t?window.t('email.cancelScheduled',{subject}):`Cancel scheduled email "${subject}"?`, { confirmText: window.t?window.t('email.cancelSend'):'Cancel Send', cancelText: window.t?window.t('email.keep'):'Keep', danger: true });
       if (!ok) return;
       try {
         await fetch(`${API_BASE}/api/email/scheduled/${it.id}`, { method: 'DELETE' });
@@ -4513,8 +4513,8 @@ function _showReaderMoreMenu(em, card, reader, anchor) {
           const d = await r.json();
           import('./ui.js').then(m => {
             if (!m.showToast) return;
-            if (d.success && d.message === 'Already exists') m.showToast('Already in contacts');
-            else if (d.success) m.showToast('Saved to contacts');
+            if (d.success && d.message === 'Already exists') m.showToast(window.t?window.t('email.alreadyInContacts'):'Already in contacts');
+            else if (d.success) m.showToast(window.t?window.t('email.savedToContacts'):'Saved to contacts');
             else m.showError && m.showError('Failed to save contact');
           }).catch(() => {});
         } catch (_) {
@@ -4602,7 +4602,7 @@ function _showReaderMoreMenu(em, card, reader, anchor) {
         const subject = em.subject || '(no subject)';
         const ok = await styledConfirm(
           `Permanently delete "${subject}"? This cannot be undone.`,
-          { confirmText: 'Delete', cancelText: 'Cancel', danger: true }
+          { confirmText: window.t?window.t('email.delete'):'Delete', cancelText: window.t?window.t('email.cancel'):'Cancel', danger: true }
         );
         if (!ok) return;
         try {
@@ -4768,7 +4768,7 @@ function _showCardMenu(em, anchor) {
   actions.push(
     { label: 'Delete', icon: _delIcon, danger: true, action: async () => {
       const subject = em.subject || '(no subject)';
-      const ok = await styledConfirm(`Delete "${subject}"?`, { confirmText: 'Delete', cancelText: 'Cancel', danger: true });
+      const ok = await styledConfirm(window.t?window.t('email.deleteEmail',{subject}):`Delete "${subject}"?`, { confirmText: window.t?window.t('email.delete'):'Delete', cancelText: window.t?window.t('email.cancel'):'Cancel', danger: true });
       if (!ok) return;
       await fetch(`${API_BASE}/api/email/delete/${em.uid}?folder=${encodeURIComponent(state._libFolder)}${_acct()}`, { method: 'DELETE' });
       await _animateEmailCardRemoval([em.uid]);
@@ -4896,7 +4896,7 @@ async function _bulkAction(action) {
   if (action === 'delete') {
     const ok = await styledConfirm(
       `Delete ${uids.length} selected email${uids.length === 1 ? '' : 's'}?`,
-      { confirmText: 'Delete', cancelText: 'Cancel', danger: true },
+      { confirmText: window.t?window.t('email.delete'):'Delete', cancelText: window.t?window.t('email.cancel'):'Cancel', danger: true },
     );
     if (!ok) return;
   }
@@ -4979,7 +4979,7 @@ async function _bulkAction(action) {
   _updateBulkBar();
   _renderGrid();
   if (failedReadSync > 0) {
-    showToast(`Failed to update ${failedReadSync} email${failedReadSync === 1 ? '' : 's'}`);
+    showToast(window.t?window.t('email.updateFailed',{n:failedReadSync,s:failedReadSync===1?'':'s'}):`Failed to update ${failedReadSync} email${failedReadSync===1?'':'s'}`);
   }
   // Sync successful local mutations into the SWR cache so reopen doesn't
   // briefly show the pre-bulk state.

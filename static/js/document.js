@@ -96,7 +96,7 @@ import * as Modals from './modalManager.js';
     const accounts = await _getEmailAccountsCached();
     const activeAccount = accounts.find(a => String(a.id) === String(activeAccountId));
     if (!activeAccount || _accountCanSend(activeAccount)) return activeAccountId;
-    if (uiModule) uiModule.showToast('Selected email account is receive-only; using your SMTP account.');
+    if (uiModule) uiModule.showToast(window.t?window.t('document.emailReceiveOnly'):'Selected email account is receive-only; using your SMTP account.');
     return null;
   }
 
@@ -1774,7 +1774,7 @@ import * as Modals from './modalManager.js';
       const proposed = (data && data.annotations) || [];
       if (!proposed.length) {
         _setPdfSaveStatus('idle');
-        if (uiModule && uiModule.showToast) uiModule.showToast('AI found nothing to fill');
+        if (uiModule && uiModule.showToast) uiModule.showToast(window.t?window.t('document.aiNothingToFill'):'AI found nothing to fill');
         return;
       }
       // Merge into markdown via the same _writeAnnotations path: parse current,
@@ -1806,7 +1806,7 @@ import * as Modals from './modalManager.js';
         throw new Error(t || r2.statusText);
       }
       _setPdfSaveStatus('saved');
-      if (uiModule && uiModule.showToast) uiModule.showToast(`AI added ${proposed.length} annotations`);
+      if (uiModule && uiModule.showToast) uiModule.showToast(window.t?window.t('document.aiAnnotated',{n:proposed.length}):`AI added ${proposed.length} annotations`);
       _renderPdfPane();
     } catch (e) {
       console.error('AI fill failed:', e);
@@ -2972,7 +2972,7 @@ import * as Modals from './modalManager.js';
     try {
       let canceled = false;
       if (uiModule) {
-        uiModule.showToast('Sending', {
+        uiModule.showToast(window.t?window.t('document.sending'):'Sending', {
           duration: 3200,
           leadingIcon: 'spinner',
           action: 'Cancel',
@@ -2985,7 +2985,7 @@ import * as Modals from './modalManager.js';
       if (canceled) {
         _restoreDetachedEmailDoc(detachedEmailDoc);
         detachedEmailDoc = null;
-        if (uiModule) uiModule.showToast('Send canceled');
+        if (uiModule) uiModule.showToast(window.t?window.t('document.sendCanceled'):'Send canceled');
         return;
       }
 
@@ -3011,7 +3011,7 @@ import * as Modals from './modalManager.js';
       if (!res.ok && data && !data.error) data.error = `Send failed (${res.status})`;
       if (data.success) {
         if (uiModule) {
-          uiModule.showToast('Message sent', {
+          uiModule.showToast(window.t?window.t('document.sent'):'Message sent', {
             duration: 7000,
             leadingIcon: 'check',
             action: 'View Message',
@@ -3122,7 +3122,7 @@ import * as Modals from './modalManager.js';
       });
       const data = await res.json();
       if (data.success) {
-        if (uiModule) uiModule.showToast('Draft saved to mailbox');
+        if (uiModule) uiModule.showToast(window.t?window.t('document.draftSaved'):'Draft saved to mailbox');
       } else {
         if (uiModule) uiModule.showError(data.error || 'Failed to save draft');
       }
@@ -3278,7 +3278,7 @@ import * as Modals from './modalManager.js';
           newBody = cleanReply + (currentBody ? '\n\n' + currentBody : '');
         }
         await _streamEmailBodyText(textarea, newBody);
-        if (uiModule) uiModule.showToast(`AI draft inserted (${data.model_used || 'AI'})`);
+        if (uiModule) uiModule.showToast(window.t?window.t('document.aiDraftInserted',{model:data.model_used||'AI'}):`AI draft inserted (${data.model_used || 'AI'})`);
       } else {
         if (uiModule) uiModule.showError(data.error || 'Failed to generate reply');
       }
@@ -3419,7 +3419,7 @@ import * as Modals from './modalManager.js';
         });
         const data = await res.json();
         if (data.success) {
-          if (uiModule) uiModule.showToast(`Scheduled for ${new Date(localDt).toLocaleString()}`);
+          if (uiModule) uiModule.showToast(window.t?window.t('document.scheduled',{time:new Date(localDt).toLocaleString()}):`Scheduled for ${new Date(localDt).toLocaleString()}`);
           cleanup();
           // Close the document
           _closeWithoutDeleting(true);
@@ -3595,7 +3595,7 @@ import * as Modals from './modalManager.js';
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: '' }),
       }).then(() => {
-        if (toast && uiModule) uiModule.showToast('Document unlinked from session');
+        if (toast && uiModule) uiModule.showToast(window.t?window.t('document.unlinked'):'Document unlinked from session');
       }).catch(() => {});
     } else {
       fetch(`${API_BASE}/api/document/${docId}`, { method: 'DELETE' }).catch(() => {});
@@ -4621,13 +4621,13 @@ import * as Modals from './modalManager.js';
         if (!res.ok) throw new Error('Failed');
         const versions = await res.json();
         if (versions.length < 2) {
-          if (uiModule) uiModule.showToast('No previous version to compare');
+          if (uiModule) uiModule.showToast(window.t?window.t('document.noPreviousVersion'):'No previous version to compare');
           return;
         }
         // versions are sorted desc — [0] is latest, [1] is previous
         const prevContent = versions[1].content || '';
         if (prevContent === current) {
-          if (uiModule) uiModule.showToast('No changes from previous version');
+          if (uiModule) uiModule.showToast(window.t?window.t('document.noChanges'):'No changes from previous version');
           return;
         }
         enterDiffMode(prevContent, current);
@@ -5902,7 +5902,7 @@ import * as Modals from './modalManager.js';
     const quote = quoteIdx >= 0 ? lines.slice(quoteIdx).join('\n') : '';
     const ownText = _emailReplyOwnText(fields.body || '');
     if (ownText && !/^(\[AI reply draft will appear here\]|Drafting AI reply)/i.test(ownText)) {
-      if (uiModule) uiModule.showToast('AI reply ready, but draft was edited');
+      if (uiModule) uiModule.showToast(window.t?window.t('document.aiReplyEdited'):'AI reply ready, but draft was edited');
       return;
     }
     const body = String(replyText || '').trim() + (quote ? `\n\n${quote}` : '');
@@ -7319,7 +7319,7 @@ import * as Modals from './modalManager.js';
 
     if (_diffChunks.length === 0) {
       _diffModeActive = false;
-      if (uiModule) uiModule.showToast('No changes');
+      if (uiModule) uiModule.showToast(window.t?window.t('document.noChanges'):'No changes');
       return;
     }
 
@@ -7856,7 +7856,7 @@ import * as Modals from './modalManager.js';
         await navigator.clipboard.writeText(textarea.value);
       } catch (e) { /* ignore */ }
     }
-    if (uiModule) uiModule.showToast('Copied to clipboard');
+    if (uiModule) uiModule.showToast(window.t?window.t('document.copied'):'Copied to clipboard');
   }
 
   /* ---- Per-tab context menu ---- */
