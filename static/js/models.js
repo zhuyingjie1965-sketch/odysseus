@@ -114,7 +114,7 @@ function _buildModelRow(mid, url, displayName, endpointId, offline, modelType) {
     e.stopPropagation();
     const nowFav = _toggleFavorite(mid);
     fav.classList.toggle('active', nowFav);
-    uiModule.showToast(nowFav ? 'Favorited' : 'Unfavorited');
+    uiModule.showToast(nowFav?(window.t?window.t('models.favorited'):'Favorited'):(window.t?window.t('models.unfavorited'):'Unfavorited'));
     refreshModels();
   });
   const span = document.createElement('span');

@@ -238,7 +238,9 @@ function initNameDropdown() {
       if (!charName || charName === '__default__') return;
       const match = userTemplates.find(t => t.name === charName);
       const isBuiltin = PROMPT_TEMPLATES.some(t => t.name === charName);
-      if (!await window.styledConfirm(`Delete "${charName}"?\n\nThis will remove the persona and all its memories.`, { confirmText: 'Delete', danger: true })) return;
+      if (!await window.styledConfirm(window.t?window.t('presets.deletePersona',{name:charName}):`Delete "${charName}"?
+
+This will remove the persona and all its memories.`, { confirmText: window.t?window.t('presets.delete'):'Delete', danger: true })) return;
       try {
         // Delete saved template if exists
         if (match) {
@@ -843,7 +845,7 @@ export async function saveCustomPreset(showToast, showError) {
 
       if (showToast) {
         // The Inject tab is a plain tuned "prompt" chat, not a persona — say so.
-        showToast(_isInjectStart ? 'Prompt saved' : 'Persona saved');
+        showToast(window.t?(_isInjectStart?window.t('presets.promptSaved'):window.t('presets.personaSaved')):(_isInjectStart?'Prompt saved':'Persona saved'));
       }
       const modal = document.getElementById('custom-preset-modal');
       if (modal) {
