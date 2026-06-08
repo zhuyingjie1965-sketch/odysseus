@@ -70,11 +70,26 @@ i18n.onLangChange(lang => {
   if (langBtn) langBtn.textContent = lang === 'zh' ? 'EN' : '中';
 });
 
-// Redirect to login on 401 from any fetch
+// Redirect to login on 401, and inject Accept-Language for backend i18n
 const _origFetch = window.fetch;
 window.fetch = async function(...args) {
+  // Inject Accept-Language header into API requests so the backend
+  // can translate error messages via I18nMiddleware.
+  const url = String(args[0]);
+  if (url.startsWith('/api') || url.startsWith(window.location.origin + '/api')) {
+    const lang = i18n.getLang();
+    if (lang !== 'en') {
+      if (args[1] && typeof args[1] === 'object') {
+        const headers = new Headers(args[1].headers || {});
+        if (!headers.has('Accept-Language')) headers.set('Accept-Language', lang);
+        args[1] = { ...args[1], headers };
+      } else {
+        args[1] = { headers: { 'Accept-Language': lang } };
+      }
+    }
+  }
   const res = await _origFetch.apply(this, args);
-  if (res.status === 401 && !String(args[0]).includes('/api/auth/')) {
+  if (res.status === 401 && !url.includes('/api/auth/')) {
     window.location.href = '/login';
   }
   return res;

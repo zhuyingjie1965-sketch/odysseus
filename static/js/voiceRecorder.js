@@ -142,7 +142,7 @@ function insertTranscription(text, showToast) {
   input.dispatchEvent(new Event('input', { bubbles: true }));
   input.focus();
 
-  if (showToast) showToast('Transcribed');
+  if (showToast) showToast(window.t?window.t('voice.transcribed'):'Transcribed');
 }
 
 /**
@@ -185,19 +185,19 @@ export function startRecording(onFileCreated, showToast, showError) {
           if (transcript) {
             insertTranscription(transcript, showToast);
           } else {
-            if (showToast) showToast('No speech detected');
+            if (showToast) showToast(window.t?window.t('voice.noSpeech'):'No speech detected');
             const audioFile = new File([audioBlob], `voice-message-${Date.now()}.webm`, { type: 'audio/webm' });
             if (onFileCreated) onFileCreated(audioFile);
           }
         } else if (provider === 'local' || provider.startsWith('endpoint:')) {
           // Show "Transcribing..." feedback
-          if (showToast) showToast('Transcribing...', 5000);
+          if (showToast) showToast(window.t?window.t('voice.transcribing'):'Transcribing...', 5000);
           try {
             const transcript = await transcribeOnServer(audioBlob);
             if (transcript) {
               insertTranscription(transcript, showToast);
             } else {
-              if (showToast) showToast('No speech detected');
+              if (showToast) showToast(window.t?window.t('voice.noSpeech'):'No speech detected');
             }
           } catch (e) {
             console.error('STT transcription error:', e);
@@ -225,7 +225,7 @@ export function startRecording(onFileCreated, showToast, showError) {
       }
 
       if (showToast) {
-        showToast('Recording...');
+        showToast(window.t?window.t('voice.recording'):'Recording...');
       }
     })
     .catch(error => {

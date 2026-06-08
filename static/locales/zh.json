@@ -312,6 +312,36 @@
   "email.aiDrafting": "正在起草 AI 回复",
   "email.reminderSet": "提醒已设置：{fmt}",
 
+  "doclib.archived": "已归档",
+  "doclib.restored": "已恢复",
+  "doclib.cloned": "文档已克隆到会话",
+  "doclib.deleted": "文档已删除",
+  "doclib.deleteDoc": "删除此文档？",
+  "doclib.deleteChat": "删除此对话？",
+  "doclib.deleteChatPerm": "永久删除此对话？",
+  "doclib.deleteResearch": "删除此研究？",
+  "doclib.deleteN": "删除 {n} 个对话？此操作不可撤销。",
+  "doclib.deleteArchived": "永久删除 {n} 个归档项目？",
+  "doclib.delete": "删除",
+  "doclib.zipping": "正在压缩 {n} 个文档…",
+  "doclib.exportedZip": "已导出 {n} 个文档（zip）",
+  "doclib.exportedN": "已导出 {n} 个文档",
+  "doclib.sorted": "已将 {updated} 个会话整理到 {folders} 个文件夹",
+  "doclib.nothingToTidy": "没有需要整理的内容",
+
+  "research.count": "{n} 个研究",
+
+  "rag.dropFiles": "将文件拖放到此处以添加到 RAG",
+  "rag.uploading": "上传中…",
+  "rag.dropHere": "将文件拖放到此处或点击上传",
+  "rag.loadFailed": "加载文件失败",
+  "rag.remove": "x",
+
+  "voice.transcribed": "已转录",
+  "voice.noSpeech": "未检测到语音",
+  "voice.transcribing": "转录中...",
+  "voice.recording": "录音中...",
+
   "lang.switch": "语言",
   "lang.en": "English",
   "lang.zh": "中文"

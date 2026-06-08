@@ -116,3 +116,42 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
                 "frame-ancestors 'none'"
             )
         return response
+
+
+class I18nMiddleware(BaseHTTPMiddleware):
+    """
+    Translate the `detail` field of JSON error responses based on
+    the client's Accept-Language header.  Only activates for zh;
+    all other locales receive the original English message.
+    """
+
+    async def dispatch(self, request: Request, call_next) -> Response:
+        response = await call_next(request)
+        ct = response.headers.get('content-type', '')
+        if response.status_code < 400 or 'application/json' not in ct:
+            return response
+
+        al = request.headers.get('accept-language', '')
+        if 'zh' not in al.lower():
+            return response
+
+        # Buffer body, translate detail, rebuild response
+        try:
+            import json as _json
+            from starlette.responses import JSONResponse as _JSONResponse
+            body = b''
+            async for chunk in response.body_iterator:
+                body += chunk
+            data = _json.loads(body)
+            if isinstance(data, dict) and 'detail' in data and isinstance(data['detail'], str):
+                from src.i18n import translate_detail
+                data['detail'] = translate_detail(data['detail'], al)
+                return _JSONResponse(
+                    content=data,
+                    status_code=response.status_code,
+                    headers=dict(response.headers),
+                    media_type='application/json',
+                )
+        except Exception:
+            pass
+        return response

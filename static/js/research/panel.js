@@ -172,7 +172,7 @@ async function _updateResearchCount() {
     if (!res.ok) return;
     const data = await res.json();
     const n = data.total || 0;
-    el.textContent = n + (n === 1 ? ' research' : ' research');
+    el.textContent = window.t?window.t('research.count',{n}):(n+' research');
   } catch {}
 }
 
@@ -691,7 +691,7 @@ function _renderJobs() {
   const statsEl = document.getElementById('research-stats');
   if (statsEl) {
     const n = recentDone.length + past.length;
-    statsEl.textContent = n + ' research';
+    statsEl.textContent = window.t?window.t('research.count',{n}):(n+' research');
   }
 
   // The main Start button doubles as "Start All (N)" when more than one job

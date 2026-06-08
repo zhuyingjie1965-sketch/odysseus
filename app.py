@@ -54,7 +54,7 @@ from core.constants import (
     REQUEST_TIMEOUT, OPENAI_API_KEY,
 )
 from core.database import SessionLocal, ApiToken
-from core.middleware import SecurityHeadersMiddleware, is_cors_preflight
+from core.middleware import SecurityHeadersMiddleware, I18nMiddleware, is_cors_preflight
 from core.auth import AuthManager
 from core.exceptions import (
     SessionNotFoundError, InvalidFileUploadError,
@@ -106,6 +106,10 @@ app.add_middleware(
 
 # ========= SECURITY HEADERS MIDDLEWARE =========
 app.add_middleware(SecurityHeadersMiddleware)
+
+# ========= I18N ERROR TRANSLATION MIDDLEWARE =========
+# Translates JSON error `detail` fields based on Accept-Language header.
+app.add_middleware(I18nMiddleware)
 
 
 # ========= REQUEST TIMEOUT (FALLBACK FOR HUNG HANDLERS) =========

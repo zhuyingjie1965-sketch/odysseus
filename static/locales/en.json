@@ -312,6 +312,36 @@
   "email.aiDrafting": "Drafting AI reply",
   "email.reminderSet": "Reminder set for {fmt}",
 
+  "doclib.archived": "Archived",
+  "doclib.restored": "Restored",
+  "doclib.cloned": "Document cloned to session",
+  "doclib.deleted": "Document deleted",
+  "doclib.deleteDoc": "Delete this document?",
+  "doclib.deleteChat": "Delete this chat?",
+  "doclib.deleteChatPerm": "Delete this chat permanently?",
+  "doclib.deleteResearch": "Delete this research?",
+  "doclib.deleteN": "Delete {n} chat{s}? This cannot be undone.",
+  "doclib.deleteArchived": "Delete {n} archived item{s} permanently?",
+  "doclib.delete": "Delete",
+  "doclib.zipping": "Zipping {n} documents…",
+  "doclib.exportedZip": "Exported {n} documents (zip)",
+  "doclib.exportedN": "Exported {n} document{s}",
+  "doclib.sorted": "Sorted {updated} sessions into {folders} folders",
+  "doclib.nothingToTidy": "Nothing to tidy",
+
+  "research.count": "{n} research",
+
+  "rag.dropFiles": "Drop files above to add to RAG",
+  "rag.uploading": "Uploading…",
+  "rag.dropHere": "Drop files here or click to upload",
+  "rag.loadFailed": "Failed to load files",
+  "rag.remove": "x",
+
+  "voice.transcribed": "Transcribed",
+  "voice.noSpeech": "No speech detected",
+  "voice.transcribing": "Transcribing...",
+  "voice.recording": "Recording...",
+
   "lang.switch": "Language",
   "lang.en": "English",
   "lang.zh": "中文"
