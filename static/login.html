@@ -468,9 +468,20 @@
 
   window.__loginSetMode = setMode;
 
+  // Helper: add Accept-Language to API fetches so the backend can
+  // translate error messages (e.g. "Invalid credentials" → "用户名或密码错误").
+  function apiFetch(url, opts) {
+    const lang = localStorage.getItem('odysseus-lang') || 'en';
+    const headers = Object.assign({}, opts && opts.headers);
+    if (lang !== 'en' && !headers['Accept-Language']) {
+      headers['Accept-Language'] = lang;
+    }
+    return fetch(url, Object.assign({}, opts, { headers }));
+  }
+
   // Check auth status
   try {
-    const res = await fetch('/api/auth/status', { credentials: 'same-origin' });
+    const res = await apiFetch('/api/auth/status', { credentials: 'same-origin' });
     const data = await res.json();
     if (data.authenticated) {
       window.location.replace('/');
@@ -506,7 +517,7 @@
       if (!code) { totpInput.focus(); submitBtn.disabled = false; return; }
       const remember = document.getElementById('remember').checked;
       try {
-        const res = await fetch('/api/auth/login', {
+        const res = await apiFetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'same-origin',
@@ -584,7 +595,7 @@
     async function doLogin(totpCode) {
       const loginBody = { username, password, remember };
       if (totpCode) loginBody.totp_code = totpCode;
-      const res = await fetch('/api/auth/login', {
+      const res = await apiFetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
